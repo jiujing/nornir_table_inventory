@@ -1,0 +1,10 @@
+---
+inventory:
+      plugin: CSVInventory
+      options:
+          csv_file: "inventory.csv"
+
+runner:
+    plugin: threaded
+    options:
+        num_workers: 100
