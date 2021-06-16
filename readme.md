@@ -44,8 +44,17 @@ from nornir import InitNornir
 
 
 nr = InitNornir(config_file=r'config.yml')
-for n,h in nr.inventory.hosts.items():
-    print(n, h.dict())
+
+for n, h in nr.inventory.hosts.items():
+  print('host name:', n)
+  print('host hostname:', h.hostname)
+  print('host username:', h.username)
+  print('host password:', h.password)
+  print('host platform:', h.platform)
+  print('host port:', h.port)
+  print('host data:', h.data)
+  print('host netmiko details:', h.connection_options.get('netmiko').dict())
+  print('='*150)
 ```
 
 
@@ -68,8 +77,18 @@ inventory = {
 }
 
 nr = InitNornir(runner=runner, inventory=inventory)
-for n,h in nr.inventory.hosts.items():
-    print(n, h.dict())
+
+for n, h in nr.inventory.hosts.items():
+  print('host name:', n)
+  print('host hostname:', h.hostname)
+  print('host username:', h.username)
+  print('host password:', h.password)
+  print('host platform:', h.platform)
+  print('host port:', h.port)
+  print('host data:', h.data)
+  print('host netmiko details:', h.connection_options.get('netmiko').dict())
+  print('='*150)
+
 ```
 
 
@@ -117,18 +136,42 @@ Arguments:
   Above table will be used as following codes and result
 
   ```python
-  nr = InitNornir(runner=runner, inventory=inventory)
-  for n,h in nr.inventory.hosts.items():
-      print(n, h.dict())
+  from nornir import InitNornir
+  
+  nr = InitNornir(config_file=r'config.yml')
+  for n, h in nr.inventory.hosts.items():
+    print('host name:', n)
+    print('host hostname:', h.hostname)
+    print('host username:', h.username)
+    print('host password:', h.password)
+    print('host platform:', h.platform)
+    print('host port:', h.port)
+    print('host data:', h.data)
+    print('host netmiko details:', h.connection_options.get('netmiko').dict())
+    print('='*150)
+  
   ```
 
   Results：
 
   ```shell
-  netdevops01 {'name': 'netdevops01', 'connection_options': {'netmiko': {'extras': {'timeout': 60, 'secret': 'admin1234!'}, 'hostname': None, 'port': 
-  None, 'username': None, 'password': None, 'platform': None}}, 'groups': [], 'data': {'city': 'bj', 'model': 'catalyst3750'}, 'hostname': '192.168.137.201', 'port': '22', 'username': 'netdevops', 'password': 'admin123!', 'platform': 'cisco_ios'}
-  netdevops02 {'name': 'netdevops02', 'connection_options': {'netmiko': {'extras': {'timeout': 60, 'secret': 'admin1234!'}, 'hostname': None, 'port': 
-  None, 'username': None, 'password': None, 'platform': None}}, 'groups': [], 'data': {'city': 'shanghai', 'model': 'catalyst3750'}, 'hostname': '192.168.137.202', 'port': '22', 'username': 'netdevops', 'password': 'admin123!', 'platform': 'cisco_ios'}
+  host name: netdevops01
+  host hostname: 192.168.137.201
+  host username: netdevops
+  host password: admin123!
+  host platform: cisco_ios
+  host port: 22
+  host data: {'city': 'bj', 'model': 'catalyst3750'}
+  host netmiko details: {'extras': {'timeout': 60, 'secret': 'admin1234!'}, 'hostname': None, 'port': None, 'username': None, 'password': None, 'platform': None}
+  ======================================================================================================================================================
+  host name: netdevops02
+  host hostname: 192.168.137.202
+  host username: netdevops
+  host password: admin123!
+  host platform: cisco_ios
+  host port: 22
+  host data: {'city': 'shanghai', 'model': 'catalyst3750'}
+  host netmiko details: {'extras': {'timeout': 60, 'secret': 'admin1234!'}, 'hostname': None, 'port': None, 'username': None, 'password': None, 'platform':
   ```
 
   
