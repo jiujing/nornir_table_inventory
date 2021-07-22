@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nornir_table_inventory"
-version = "0.2.0"
+version = "0.3.0"
 description = "nornir inventory plugin,support managing inventory by csv or excel file"
 authors = ["feifeiflight <feifeiflight@126.com>"]
 license = "Apache-2.0"
@@ -20,8 +20,10 @@ classifiers = [
 
 
 [tool.poetry.plugins."nornir.plugins.inventory"]
+"FlatDataInventory" = "nornir_table_inventory.plugins.inventory.table:FlatDataInventory"
 "CSVInventory" = "nornir_table_inventory.plugins.inventory.table:CSVInventory"
 "ExcelInventory" = "nornir_table_inventory.plugins.inventory.table:ExcelInventory"
+
 
 
 

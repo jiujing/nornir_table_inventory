@@ -1,6 +1,6 @@
 import csv
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import pandas as pd
 from nornir.core.inventory import (
@@ -97,15 +97,12 @@ def _get_host_obj(data: Dict[str, Any]) -> Host:
     )
 
 
-class CSVInventory:
+class FlatDataInventory:
     def __init__(
             self,
-            csv_file: str = "inventory.csv"
+            data: List[Dict]
     ) -> None:
-        self.hosts_list = []
-        with open(csv_file, mode='r', encoding='utf8') as f:
-            for i in csv.DictReader(f):
-                self.hosts_list.append(i)
+        self.hosts_list = data
 
     def load(self) -> Inventory:
         defaults = Defaults()
@@ -118,7 +115,19 @@ class CSVInventory:
         return Inventory(hosts=hosts, groups=groups, defaults=defaults)
 
 
-class ExcelInventory(CSVInventory):
+class CSVInventory(FlatDataInventory):
+    def __init__(
+            self,
+            csv_file: str = "inventory.csv"
+    ) -> None:
+        data = []
+        with open(csv_file, mode='r', encoding='utf8') as f:
+            for i in csv.DictReader(f):
+                data.append(i)
+        super().__init__(data=data)
+
+
+class ExcelInventory(FlatDataInventory):
     def __init__(
             self,
             excel_file: str = "inventory.xlsx"
@@ -126,7 +135,7 @@ class ExcelInventory(CSVInventory):
         self.hosts_list = []
         dataframe = pd.read_excel(excel_file)
         items = dataframe.to_dict(orient='records')
-        self.hosts_list = items
+        super().__init__(data=items)
 
 
 if __name__ == '__main__':
