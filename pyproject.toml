@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nornir_table_inventory"
-version = "0.3.0"
+version = "0.4.0"
 description = "nornir inventory plugin,support managing inventory by csv or excel file"
 authors = ["feifeiflight <feifeiflight@126.com>"]
 license = "Apache-2.0"
@@ -28,7 +28,7 @@ classifiers = [
 
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.7"
 nornir = "^3.0.0"
 pandas = "^1.2.0"
 
