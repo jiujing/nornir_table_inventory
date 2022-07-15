@@ -6,15 +6,17 @@
 # nornir_table_inventory
 
 The nornir_table_inventory is [Nornir](https://github.com/nornir-automation/nornir) plugin for inventory.It can manage inventory by table file(CSV or Excel).
+Excitedly, it provides a hidden method to use your database or your automation system as a inventory source.
 Netmiko connections support only.
 
 It doesn't support groups or defaults,because it focuses on flat data,and the data lies in table file of two-dimensional.
 
 
 
-nornir_table_inventory supports 2  inventory classes .
+nornir_table_inventory supports 3  inventory classes .
 - `CSVInventory` manages inventory by csv file
 - `ExcelInventory` manages inventory by excel(xlsx) file
+- `FlatDataInventory` manages inventory by python list object of dict,by this inventory plugin ,you can combine nornir with your database and automation system.
 
 ## Installing
 
@@ -174,4 +176,54 @@ Arguments:
   host netmiko details: {'extras': {'timeout': 60, 'secret': 'admin1234!'}, 'hostname': None, 'port': None, 'username': None, 'password': None, 'platform':
   ```
 
+  # A Strong Hidden Method —— any data source as a inventory
+
+The two inventory plugins are based on the FlatDataInventory plugin. 
+FlatDataInventory plugin provides a way to load inventory by puthon's list,the list's member is dict.
+We can get some data, and transform them into form as list of dict.
+By this way we can combine nornir with any database or automation system.
+You do not need sql or csv plugin any more.
+ 
+  ```python
+  from nornir import InitNornir
+from nornir_utils.plugins.functions import print_result
+from nornir_netmiko import netmiko_send_command
+
+
+def get_nornir_by_your_func(some_args=None, num_workers=100):
+    """Use any way to get some data(such as sql or restful api), and transform them into form as follwing"""
+    data = [{'name': 'netdevops01', 'hostname': '192.168.137.201',
+             'platform': 'cisco_ios', 'port': 22, 'username': 'netdevops',
+             'password': 'admin123!', 'city': 'bj', 'model': 'catalyst3750',
+             'netmiko_timeout': 180, 'netmiko_secret': 'admin1234!',
+             'netmiko_banner_timeout': '30', 'netmiko_conn_timeout': '20'},
+            {'name': 'netdevops02', 'hostname': '192.168.137.202', 'platform':
+                'cisco_ios', 'port': 22, 'username': 'netdevops', 'password': 'admin123!',
+             'city': 'bj', 'model': 'catalyst3750', 'netmiko_timeout': 120,
+             'netmiko_secret': 'admin1234!', 'netmiko_banner_timeout': 30,
+             'netmiko_conn_timeout': 20}
+            ]
+    runner = {
+        "plugin": "threaded",
+        "options": {
+            "num_workers": num_workers,
+        },
+    }
+    inventory = {
+        "plugin": "FlatDataInventory",
+        "options": {
+            "data": data,
+        },
+    }
+    nr = InitNornir(runner=runner, inventory=inventory)
+    return nr
+
+
+if __name__ == '__main__':
+    
+    nr = get_nornir_by_your_func()
+    bj_devs = nr.filter(city='bj')
+    r = bj_devs.run(task=netmiko_send_command, command_string='display version')
+    print_result(r)
   
+  ```

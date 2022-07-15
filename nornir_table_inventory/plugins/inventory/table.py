@@ -134,11 +134,10 @@ class ExcelInventory(FlatDataInventory):
     ) -> None:
         self.hosts_list = []
         dataframe = pd.read_excel(excel_file)
+        dataframe.fillna('')
         items = dataframe.to_dict(orient='records')
         super().__init__(data=items)
 
 
 if __name__ == '__main__':
-    t = ExcelInventory()
-    inv = t.load()
-    print(inv)
+    ...

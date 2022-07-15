@@ -5,13 +5,14 @@
 
 # nornir_table_inventory
 
-nornir_table_inventory 是 [Nornir](https://github.com/nornir-automation/nornir)的一个插件，通过表格（csv、Excel）文件来管理nornir的设备清单。
+nornir_table_inventory 是 [Nornir](https://github.com/nornir-automation/nornir)的一个插件，通过表格（csv、Excel）文件来管理nornir的设备清单。它甚至提供了一种隐藏的方法，可以让你的数据库或者自动化系统作为nornir的inventory数据源。
 
 由于是表格承载，所以只支持扁平化的数据，对于groups和defaults目前不支持，后续也暂时不考虑。
 
 nornir_table_inventory 提供2种 inventory 类 .
 - `CSVInventory` 支持通过csv文件进行设备清单管理
 - `ExcelInventory` 支持通过Excel（xlsx）文件进行设备清单管理
+- `FlatDataInventory` 使用python的列表对象（成员是字典）进行设备清单管理
 
 ## 安装
 
@@ -173,4 +174,53 @@ Arguments:
   
   ```
   
+  # 强有力的隐藏方法——以任意数据源作为设备清单
+
+  上述的方法都是基于表格数据进行资产清单的加载，实际上述2个设备清单插件使用了一个共同的资产插件FlatDataInventory。
+  它允许我们通过函数对接到我们的系统，将数据获取后，加工成为字典的列表，进而加载到nornir当中去。
+  通过这个函数，我们可以使用任意数据源来记载nornir，可以是数据库、可以是我们自动化系统的api等等。
+  有了它，也许你就不需要其他的sql或者csv的nornir插件了。
+  ```python
+  from nornir import InitNornir
+from nornir_utils.plugins.functions import print_result
+from nornir_netmiko import netmiko_send_command
+
+
+def get_nornir_by_your_func(some_args=None, num_workers=100):
+    
+    ''' 用你能想到的手段结合封装的some_args从api或者数据库中获取数据，进行转换，转后数据示例如下'''
+    data = [{'name': 'netdevops01', 'hostname': '192.168.137.201',
+             'platform': 'cisco_ios', 'port': 22, 'username': 'netdevops',
+             'password': 'admin123!', 'city': 'bj', 'model': 'catalyst3750',
+             'netmiko_timeout': 180, 'netmiko_secret': 'admin1234!',
+             'netmiko_banner_timeout': '30', 'netmiko_conn_timeout': '20'},
+            {'name': 'netdevops02', 'hostname': '192.168.137.202', 'platform':
+                'cisco_ios', 'port': 22, 'username': 'netdevops', 'password': 'admin123!',
+             'city': 'bj', 'model': 'catalyst3750', 'netmiko_timeout': 120,
+             'netmiko_secret': 'admin1234!', 'netmiko_banner_timeout': 30,
+             'netmiko_conn_timeout': 20}
+            ]
+    runner = {
+        "plugin": "threaded",
+        "options": {
+            "num_workers": num_workers,
+        },
+    }
+    inventory = {
+        "plugin": "FlatDataInventory",
+        "options": {
+            "data": data,
+        },
+    }
+    nr = InitNornir(runner=runner, inventory=inventory)
+    return nr
+
+
+if __name__ == '__main__':
+    
+    nr = get_nornir_by_your_func()
+    bj_devs = nr.filter(city='bj')
+    r = bj_devs.run(task=netmiko_send_command, command_string='display version')
+    print_result(r)
   
+  ```
