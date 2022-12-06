@@ -73,7 +73,11 @@ def _get_host_netmiko_options(data: Dict[str, Any]) -> Dict[str, Any]:
                 else:
                     extra_opts[new_k] = True
             else:
-                extra_opts[new_k] = v
+                # if the value is nan,convert it to None
+                if str(v)=='nan':
+                    extra_opts[new_k] = None
+                else:
+                    extra_opts[new_k] = v
 
     if extra_opts:
         netmiko_options['netmiko']['extras'] = extra_opts
