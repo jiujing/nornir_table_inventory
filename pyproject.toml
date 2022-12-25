@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nornir_table_inventory"
-version = "0.4.1"
+version = "0.4.2"
 description = "nornir inventory plugin,support managing inventory by csv or excel file"
 authors = ["feifeiflight <feifeiflight@126.com>"]
 license = "Apache-2.0"

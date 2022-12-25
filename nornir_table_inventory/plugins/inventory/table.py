@@ -87,13 +87,33 @@ def _get_host_netmiko_options(data: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def _get_host_obj(data: Dict[str, Any]) -> Host:
+    # get keypoint data and convert to string or int
+    name = data.get('name')
+    hostname = data.get("hostname")
+    port = data.get("port", 22)
+    username = data.get("username")
+    password = data.get("password")
+    platform = data.get("platform")
+    if name:
+        name = str(name)
+    if hostname:
+        hostname = str(hostname)
+    if port:
+        port = int(port)
+    if username:
+        username = str(username)
+    if password:
+        password = str(password)
+    if platform:
+        platform = str(platform)
+
     return Host(
-        name=data.get('name'),
-        hostname=data.get("hostname"),
-        port=data.get("port", 22),
-        username=data.get("username"),
-        password=data.get("password"),
-        platform=data.get("platform"),
+        name=name,
+        hostname=hostname,
+        port=port,
+        username=username,
+        password=password,
+        platform=platform,
         data=_get_host_data(data),
         groups=None,
         defaults={},
