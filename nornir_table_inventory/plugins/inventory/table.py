@@ -94,8 +94,6 @@ def _get_host_obj(data: Dict[str, Any]) -> Host:
     username = data.get("username")
     password = data.get("password")
     platform = data.get("platform")
-    if name:
-        name = str(name) if str(name) != "nan" else None
     if hostname:
         hostname = str(hostname) if str(hostname) != "nan" else None
     if port:
@@ -134,7 +132,8 @@ class FlatDataInventory:
         hosts = Hosts()
 
         for host_dict in self.hosts_list:
-            hosts[host_dict['name']] = _get_host_obj(host_dict)
+            if str(host_dict['name']) != "nan":
+                hosts[host_dict['name']] = _get_host_obj(host_dict)
 
         return Inventory(hosts=hosts, groups=groups, defaults=defaults)
 
