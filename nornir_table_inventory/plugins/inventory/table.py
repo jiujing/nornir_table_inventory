@@ -35,7 +35,7 @@ def _get_host_data(data: Dict[str, Any]) -> Dict[str, Any]:
     netmiko_prefix = 'netmiko_'
     for k, v in data.items():
         if (k not in no_data_fields) and (netmiko_prefix not in k):
-            resp_data[k] = v
+            resp_data[k] = v if str(v) != "nan" else None
     return resp_data
 
 
@@ -95,17 +95,17 @@ def _get_host_obj(data: Dict[str, Any]) -> Host:
     password = data.get("password")
     platform = data.get("platform")
     if name:
-        name = str(name)
+        name = str(name) if str(name) != "nan" else None
     if hostname:
-        hostname = str(hostname)
+        hostname = str(hostname) if str(hostname) != "nan" else None
     if port:
-        port = int(port)
+        port = int(port) if str(port) != "nan" else None
     if username:
-        username = str(username)
+        username = str(username) if str(username) != "nan" else None
     if password:
-        password = str(password)
+        password = str(password) if str(password) != "nan" else None
     if platform:
-        platform = str(platform)
+        platform = str(platform) if str(platform) != "nan" else None
 
     return Host(
         name=name,
