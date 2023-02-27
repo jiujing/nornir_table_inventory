@@ -94,6 +94,8 @@ def _get_host_obj(data: Dict[str, Any]) -> Host:
     username = data.get("username")
     password = data.get("password")
     platform = data.get("platform")
+    if name:
+        name = str(name)
     if hostname:
         hostname = str(hostname) if str(hostname) != "nan" else None
     if port:
