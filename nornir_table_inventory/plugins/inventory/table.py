@@ -140,7 +140,7 @@ class FlatDataInventory:
         hosts = Hosts()
 
         for host_dict in self.hosts_list:
-            if str(host_dict['name']) != "nan":
+            if not _empty(host_dict['name']):
                 hosts[host_dict['name']] = _get_host_obj(host_dict)
 
         return Inventory(hosts=hosts, groups=groups, defaults=defaults)
