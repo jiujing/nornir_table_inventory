@@ -142,6 +142,9 @@ class FlatDataInventory:
         for host_dict in self.hosts_list:
             if not _empty(host_dict['name']):
                 hosts[host_dict['name']] = _get_host_obj(host_dict)
+            else:
+                logger.error(f"HOST name is empty for data : {host_dict}")
+                raise Exception('HOST name must not be empty')
 
         return Inventory(hosts=hosts, groups=groups, defaults=defaults)
 
