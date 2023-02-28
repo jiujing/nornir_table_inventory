@@ -17,8 +17,8 @@ logger = logging.getLogger(__name__)
 
 
 def _empty(x: Any):
-    """Checks if x is a NaN (not a number) or None"""
-    return x is None or (isinstance(x, float) and isnan(x))
+    """Checks if x is a NaN (not a number) or None/empty string"""
+    return x is None or (isinstance(x, float) and isnan(x)) or x == ""
 
 
 def _get_connection_options(data: Dict[str, Any]) -> Dict[str, ConnectionOptions]:
