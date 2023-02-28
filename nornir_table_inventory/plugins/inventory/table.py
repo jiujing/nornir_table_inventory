@@ -1,5 +1,6 @@
 import csv
 import logging
+from math import isnan
 from typing import Any, Dict, List
 
 import pandas as pd
@@ -13,6 +14,11 @@ from nornir.core.inventory import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def _empty(x: Any):
+    """Checks if x is a NaN (not a number) or None/empty string"""
+    return x is None or (isinstance(x, float) and isnan(x)) or x == ""
 
 
 def _get_connection_options(data: Dict[str, Any]) -> Dict[str, ConnectionOptions]:
@@ -35,7 +41,7 @@ def _get_host_data(data: Dict[str, Any]) -> Dict[str, Any]:
     netmiko_prefix = 'netmiko_'
     for k, v in data.items():
         if (k not in no_data_fields) and (netmiko_prefix not in k):
-            resp_data[k] = v
+            resp_data[k] = v if not _empty(v) else None
     return resp_data
 
 
@@ -74,7 +80,7 @@ def _get_host_netmiko_options(data: Dict[str, Any]) -> Dict[str, Any]:
                     extra_opts[new_k] = True
             else:
                 # if the value is nan,convert it to None
-                if str(v)=='nan':
+                if _empty(v):
                     extra_opts[new_k] = None
                 else:
                     extra_opts[new_k] = v
@@ -97,15 +103,15 @@ def _get_host_obj(data: Dict[str, Any]) -> Host:
     if name:
         name = str(name)
     if hostname:
-        hostname = str(hostname)
+        hostname = str(hostname) if not _empty(hostname) else None
     if port:
-        port = int(port)
+        port = int(port) if not _empty(port) else None
     if username:
-        username = str(username)
+        username = str(username) if not _empty(username) else None
     if password:
-        password = str(password)
+        password = str(password) if not _empty(password) else None
     if platform:
-        platform = str(platform)
+        platform = str(platform) if not _empty(platform) else None
 
     return Host(
         name=name,
@@ -134,7 +140,11 @@ class FlatDataInventory:
         hosts = Hosts()
 
         for host_dict in self.hosts_list:
-            hosts[host_dict['name']] = _get_host_obj(host_dict)
+            if not _empty(host_dict['name']):
+                hosts[host_dict['name']] = _get_host_obj(host_dict)
+            else:
+                logger.error(f"HOST name is empty for data : {host_dict}")
+                raise Exception('HOST name must not be empty')
 
         return Inventory(hosts=hosts, groups=groups, defaults=defaults)
 
